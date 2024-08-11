@@ -1,0 +1,4 @@
+
+const Signup = (req,res) =>{
+    
+}

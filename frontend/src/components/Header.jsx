@@ -32,7 +32,7 @@ const Header = () => {
         </Button>
 
         <Link to='/sign-in'>
-          <Button gradientDuoTone='purpleToBlue'>
+          <Button gradientDuoTone='purpleToBlue' outline>
             <span className='text-sm'>Sign In</span>
           </Button>
         </Link>
