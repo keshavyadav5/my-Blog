@@ -6,8 +6,11 @@ import Signin from './pages/Signin'
 import Signup from './pages/Signup'
 import Dashboard from './pages/Dashboard'
 import Project from './pages/Project'
-import Footer from './components/Footer'
 import Header from './components/Header'
+import FooterComponent from './components/FooterComponent'
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const App = () => {
   return (
@@ -21,7 +24,8 @@ const App = () => {
         <Route path='/dashboard' element={<Dashboard />} />
         <Route path='/project' element={<Project />} />
       </Routes>
-      <Footer />
+      <ToastContainer position='top-center' />
+      <FooterComponent />
     </BrowserRouter>
   )
 }
