@@ -70,7 +70,7 @@ const Signup = () => {
             </div>
             <div>
               <Label value='Your Password' />
-              <TextInput type='password' placeholder="password" id='password' required onChange={handleChange} />
+              <TextInput type='password' placeholder="**************" id='password' required onChange={handleChange} />
             </div>
             <Button gradientDuoTone='purpleToPink' type='submit' disabled={loading}>
               {
