@@ -3,11 +3,14 @@ import { Link, useNavigate } from 'react-router-dom'
 import { Button, Label, Spinner, TextInput } from 'flowbite-react';
 import axios from 'axios'
 import { toast } from 'react-toastify'
+import { useDispatch, useSelector } from 'react-redux'
+import { signInStart, signInSuccess, signInFailure } from '../redux/userSlice';
 
 const Signin = () => {
   const navigate = useNavigate()
   const [formData, setFormData] = useState({})
-  const [loading, setLoading] = useState(false)
+  const { loading } = useSelector(state => state.user)
+  const dispatch = useDispatch()
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.id]: e.target.value.trim() })
@@ -15,7 +18,7 @@ const Signin = () => {
   const handleOnSubmit = async (e) => {
     e.preventDefault();
     try {
-      setLoading(true)
+      dispatch(signInStart())
       const res = await axios.post(
         'http://localhost:3000/api/auth/signin',
         {
@@ -26,19 +29,16 @@ const Signin = () => {
           withCredentials: true,
         }
       );
-      setLoading(false)
+      if (res.data.success === false) {
+        dispatch(signInFailure(res.data.message));
+        toast.error(res.data.message);
+        return;
+      }
+      dispatch(signInSuccess(res.data))
       toast.success(res.data.message);
       navigate('/');
     } catch (error) {
-      if (error.response) {
-        toast.error(error.response.data.message || 'Something went wrong!');
-      } else if (error.request) {
-        toast.error('No response from the server. Please try again later.');
-      } else {
-        toast.error('Error: ' + error.message);
-      }
-      console.log(error);
-      setLoading(false)
+      dispatch(signInFailure(error.message))
     }
   };
 
