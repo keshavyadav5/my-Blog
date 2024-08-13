@@ -5,6 +5,7 @@ import axios from 'axios'
 import { toast } from 'react-toastify'
 import { useDispatch, useSelector } from 'react-redux'
 import { signInStart, signInSuccess, signInFailure } from '../redux/userSlice';
+import OAuth from '../components/OAuth';
 
 const Signin = () => {
   const navigate = useNavigate()
@@ -72,6 +73,7 @@ const Signin = () => {
                 loading ? <Spinner size='sm' /> : 'Sign In'
               }
             </Button>
+            <OAuth />
           </form>
           <div className='flex gap-2 text-sm mt-3'>
             <span>Don't have an account?</span>
