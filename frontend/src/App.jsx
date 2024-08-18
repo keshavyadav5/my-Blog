@@ -11,6 +11,7 @@ import FooterComponent from './components/FooterComponent'
 
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import PrivateRoute from './components/PrivateRoute'
 
 const App = () => {
   return (
@@ -21,7 +22,9 @@ const App = () => {
         <Route path='/about' element={<About />} />
         <Route path='/sign-in' element={<Signin />} />
         <Route path='/sign-up' element={<Signup />} />
-        <Route path='/dashboard' element={<Dashboard />} />
+        <Route element={<PrivateRoute/>} >
+          <Route path='/dashboard' element={<Dashboard />} />
+        </Route>
         <Route path='/project' element={<Project />} />
       </Routes>
       <ToastContainer position='top-center' />
