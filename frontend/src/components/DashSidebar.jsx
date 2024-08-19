@@ -25,7 +25,9 @@ const DashSidebar = () => {
             <SidebarItem
               active={tab === 'profile'}
               icon={HiUser} label={'user'}
-              labelColor='dark'>
+              labelColor='dark'
+              as='div'
+              >
               Profile
             </SidebarItem>
           </Link>
