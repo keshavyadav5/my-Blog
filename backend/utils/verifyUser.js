@@ -1,20 +1,28 @@
 const jwt = require('jsonwebtoken');
 const { errorHandler } = require('./error');
-require('dotenv').config()
+require('dotenv').config();
 
-const verifyToken = (req,res,next) =>{
-  const token = req.cookies.access_token;  
-   
-  if(!token){
-    return next(errorHandler(401, "Unauthorized"))
+const verifyToken = (req, res, next) => {
+  const cookies = req.headers.cookie;
+
+  if (!cookies) {
+    return next(errorHandler(401, "Unauthorized - No cookies found"));
   }
-  jwt.verify(token, process.env.SECRET_KEY, (err, user) => {
+
+  const token = cookies.split("=")[1];
+
+  if (!token) {
+    return next(errorHandler(401, "Unauthorized - No token found"));
+  }
+
+  jwt.verify(String(token), process.env.SECRET_KEY, (err, user) => {
     if (err) {
-      return next(errorHandler(403, "Forbidden"));
+      return next(errorHandler(400, "Invalid token"));
     }
-    req.user = user;
+    req.id = user.id;
+    console.log("user verified")
     next();
   });
-}
+};
 
 module.exports = verifyToken;
