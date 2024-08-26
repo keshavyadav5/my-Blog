@@ -5,18 +5,20 @@ import { getDownloadURL, getStorage, ref, uploadBytesResumable } from 'firebase/
 import { app } from '../firebase';
 import { CircularProgressbar } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
-import { 
-  updateStart, 
-  updateSuccess, 
+import {
+  updateStart,
+  updateSuccess,
   updateFailure,
   deleteUserStart,
   deleteUserSuccess,
-  deleteUserFailure
- } from '../redux/userSlice';
+  deleteUserFailure,
+  signoutSuccess,
+} from '../redux/userSlice';
 import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify'
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+
 
 
 const DashProfile = () => {
@@ -26,7 +28,7 @@ const DashProfile = () => {
   const [imageFileUploadingProgress, setImageFileUploadingProgress] = useState(null);
   const [imageFileUploadingError, setImageFileUploadingError] = useState(null);
   const [formData, setFormData] = useState({});
-  const [ showModel, setShowModel] = useState(false)
+  const [showModel, setShowModel] = useState(false)
   const filePickerRef = useRef();
   const dispatch = useDispatch();
 
@@ -121,7 +123,7 @@ const DashProfile = () => {
       const res = await axios.delete(`http://localhost:3000/api/user/delete/${currentUser._id}`, {
         withCredentials: true,
       });
-  
+
       if (res.status !== 200) {
         toast.error(res.data.message || "Failed to delete user");
         dispatch(deleteUserFailure(res.data.message));
@@ -134,8 +136,28 @@ const DashProfile = () => {
       dispatch(deleteUserFailure(error.message));
     }
   };
-  
 
+  const handleSignout = async () => {
+    try {
+      const res = await axios.post(
+        'http://localhost:3000/api/user/signout', 
+        {},
+        { withCredentials: true }
+      );
+  
+      if (res.status !== 200) {
+        toast.error('Error signing out');
+      } else {
+        console.log("singout'",signoutSuccess());
+        toast.success('Signed out successfully');
+        
+        dispatch(signoutSuccess())
+      }
+    } catch (error) {
+      toast.error(error.message || "An error occurred");
+    }
+  };
+  
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-semibold text-3xl'>Profile</h1>
@@ -190,7 +212,7 @@ const DashProfile = () => {
           type="email"
           id='email'
           placeholder='email'
-          defaultValue={currentUser.email || currentUser.email} 
+          defaultValue={currentUser.email || currentUser.email}
           onChange={handleChange}
           readOnly
         />
@@ -205,34 +227,37 @@ const DashProfile = () => {
           Update
         </Button>
         <div className="text-red-500 flex justify-between">
-          <span 
-          className='cursor-pointer'
-          onClick={() => setShowModel(true)}
+          <span
+            className='cursor-pointer'
+            onClick={() => setShowModel(true)}
           >Delete Account</span>
-          <span className='cursor-pointer'>Sign out</span>
+          <span
+            className='cursor-pointer'
+            onClick={handleSignout}
+          >Sign out</span>
         </div>
       </form>
-      <Modal 
-      show={showModel}
-      onClick={()=>setShowModel(false)}
-      popup
-      size='md'
+      <Modal
+        show={showModel}
+        onClick={() => setShowModel(false)}
+        popup
+        size='md'
       >
-      <Modal.Header/>
-      <Modal.Body>
-        <div className="text-center">
-          <HiOutlineExclamationCircle className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto'/>
-          <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Are you sure to delete your accoount?</h3>
-          <div className='flex justify-center gap-5'>
-            <Button color='failure' onClick={handleDeleteUser}>
-              Yes, I'm sure
-            </Button>
-            <Button color='gray' onClick={()=>setShowModel(false)}>
-              No, cancel
-            </Button>
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
+            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Are you sure to delete your accoount?</h3>
+            <div className='flex justify-center gap-5'>
+              <Button color='failure' onClick={handleDeleteUser}>
+                Yes, I'm sure
+              </Button>
+              <Button color='gray' onClick={() => setShowModel(false)}>
+                No, cancel
+              </Button>
+            </div>
           </div>
-        </div>
-      </Modal.Body>
+        </Modal.Body>
       </Modal>
     </div>
   );
