@@ -41,16 +41,23 @@ const SignIn = async (req, res, next) => {
       return next(errorHandler(400, 'Email or password is incorrect'));
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY, {
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      process.env.SECRET_KEY, {
       expiresIn: '1h',
-    });
+    }
+    );
 
     const { password: pass, ...rest } = user._doc
-    res.cookie('access_token', token, { httpOnly: true }).status(200).json({
-      success: true,
-      message: "Login successfull",
-      rest
-    })
+    res.cookie('access_token',
+      token,
+      { httpOnly: true })
+      .status(200)
+      .json({
+        success: true,
+        message: "Login successfull",
+        rest
+      })
   } catch (error) {
     console.log(error);
     next(error);
@@ -63,7 +70,10 @@ const google = async (req, res, next) => {
     let user = await User.findOne({ email });
 
     if (user) {
-      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+      const token = jwt.sign(
+        { id: user._id, isAdmin: user.isAdmin },
+        process.env.SECRET_KEY);
+
       const { password, ...userWithoutPassword } = user._doc;
       res.status(200)
         .cookie('access_token', token, { httpOnly: true })
@@ -82,7 +92,7 @@ const google = async (req, res, next) => {
 
       await user.save();
 
-      const token = jwt.sign({ id: user._id }, process.env.SECRET_KEY);
+      const token = jwt.sign({ id: user._id, isAdmin: user.isAdmin }, process.env.SECRET_KEY);
       const { password, ...newUserWithoutPassword } = user._doc;
 
       res.status(200)

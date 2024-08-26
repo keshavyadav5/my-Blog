@@ -18,6 +18,7 @@ import { useDispatch } from 'react-redux';
 import axios from 'axios';
 import { toast } from 'react-toastify'
 import { HiOutlineExclamationCircle } from "react-icons/hi";
+import { Link } from 'react-router-dom'
 
 
 
@@ -140,24 +141,24 @@ const DashProfile = () => {
   const handleSignout = async () => {
     try {
       const res = await axios.post(
-        'http://localhost:3000/api/user/signout', 
+        'http://localhost:3000/api/user/signout',
         {},
         { withCredentials: true }
       );
-  
+
       if (res.status !== 200) {
         toast.error('Error signing out');
       } else {
-        console.log("singout'",signoutSuccess());
+        console.log("singout'", signoutSuccess());
         toast.success('Signed out successfully');
-        
+
         dispatch(signoutSuccess())
       }
     } catch (error) {
       toast.error(error.message || "An error occurred");
     }
   };
-  
+
   return (
     <div className='max-w-lg mx-auto p-3 w-full'>
       <h1 className='my-7 text-center font-semibold text-3xl'>Profile</h1>
@@ -190,7 +191,7 @@ const DashProfile = () => {
             />
           )}
           <img
-            src={imageFileUrl || currentUser.profilePicture}
+            src={imageFileUrl || currentUser.profilePicture ||  currentUser.rest.profilePicture}
             alt="user"
             className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${imageFileUploadingProgress && imageFileUploadingProgress < 100 && 'opacity-60'}`}
           />
@@ -204,7 +205,7 @@ const DashProfile = () => {
           type="text"
           id='username'
           placeholder='username'
-          defaultValue={currentUser.username || currentUser.username}
+          defaultValue={currentUser.username || currentUser.rest.username }
           onChange={handleChange}
           readOnly
         />
@@ -212,7 +213,7 @@ const DashProfile = () => {
           type="email"
           id='email'
           placeholder='email'
-          defaultValue={currentUser.email || currentUser.email}
+          defaultValue={currentUser.email || currentUser.rest.email}
           onChange={handleChange}
           readOnly
         />
@@ -226,6 +227,19 @@ const DashProfile = () => {
         <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled>
           Update
         </Button>
+        {
+          currentUser.isAdmin && (
+            <Link to='/create-post'>
+              <Button
+                type='button'
+                gradientDuoTone='purpleToPink'
+                className='w-full'
+              >
+                Create a Post
+              </Button>
+            </Link>
+          )
+        }
         <div className="text-red-500 flex justify-between">
           <span
             className='cursor-pointer'
