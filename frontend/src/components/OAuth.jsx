@@ -33,6 +33,8 @@ const OAuth = () => {
         return;
       }
 
+      console.log
+
       dispatch(signInSuccess(res.data));
       toast.success(res.data.message);
       navigate('/');

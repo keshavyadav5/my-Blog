@@ -4,6 +4,7 @@ require('dotenv').config();
 const db = require('./db');
 const authRoute = require('./routes/auth.route');
 const userRoute = require('./routes/user.route');
+const createPostRoute = require('./routes/post.route')
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
@@ -21,6 +22,7 @@ app.get('/', (req, res) => {
 });
 app.use('/api/auth', authRoute);
 app.use('/api/user', userRoute);
+app.use('/api/post',createPostRoute)
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

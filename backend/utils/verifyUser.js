@@ -4,12 +4,13 @@ require('dotenv').config();
 
 const verifyToken = (req, res, next) => {
   const cookies = req.headers.cookie;
-
+  
   if (!cookies) {
     return next(errorHandler(401, "Unauthorized - No cookies found"));
   }
 
   const token = cookies.split("=")[1];
+
 
   if (!token) {
     return next(errorHandler(401, "Unauthorized - No token found"));
@@ -19,8 +20,10 @@ const verifyToken = (req, res, next) => {
     if (err) {
       return next(errorHandler(400, "Invalid token"));
     }
+    
     req.id = user.id;
-    console.log("user verified")
+    req.user = user;
+    
     next();
   });
 };

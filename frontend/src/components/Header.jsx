@@ -13,7 +13,7 @@ const Header = () => {
   const path = useLocation().pathname;
   const dispatch = useDispatch()
   const { currentUser } = useSelector((state) => state.user)
-  const { theme } = useSelector((state) => state.theme)
+  const { theme } = useSelector((state) => state.theme)  
 
 
   const handleSignout = async () => {
@@ -70,14 +70,14 @@ const Header = () => {
             label={
               <Avatar
                 alt="User"
-                img={currentUser.profilePicture}
+                img={currentUser?.profilePicture}
                 rounded
               />
             }
             >
             <Dropdown.Header>
-              <span className='block text-sm'>@{currentUser.username || currentUser.rest.username}</span>
-              <span className='block text-sm font-medium truncate'>{currentUser.email || currentUser.rest.email}</span>
+              <span className='block text-sm'>@{currentUser?.username || currentUser?.rest?.username}</span>
+              <span className='block text-sm font-medium truncate'>{currentUser?.email || currentUser?.rest?.email}</span>
             </Dropdown.Header>
             <Link to={"/dashboard?tab=profile"} >
               <Dropdown.Item>Profile</Dropdown.Item>

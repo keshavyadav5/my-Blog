@@ -40,7 +40,7 @@ const DashProfile = () => {
       setImageFileUrl(URL.createObjectURL(file));
     }
   };
-
+  
   useEffect(() => {
     if (imageFile) {
       uploadImage();
@@ -191,7 +191,7 @@ const DashProfile = () => {
             />
           )}
           <img
-            src={imageFileUrl || currentUser.profilePicture ||  currentUser.rest.profilePicture}
+            src={imageFileUrl || currentUser?.profilePicture ||  currentUser?.rest?.profilePicture}
             alt="user"
             className={`rounded-full w-full h-full object-cover border-8 border-[lightgray] ${imageFileUploadingProgress && imageFileUploadingProgress < 100 && 'opacity-60'}`}
           />
@@ -205,7 +205,7 @@ const DashProfile = () => {
           type="text"
           id='username'
           placeholder='username'
-          defaultValue={currentUser.username || currentUser.rest.username }
+          defaultValue={currentUser?.username || currentUser?.rest?.username }
           onChange={handleChange}
           readOnly
         />
@@ -213,7 +213,7 @@ const DashProfile = () => {
           type="email"
           id='email'
           placeholder='email'
-          defaultValue={currentUser.email || currentUser.rest.email}
+          defaultValue={currentUser?.email || currentUser?.rest?.email}
           onChange={handleChange}
           readOnly
         />
@@ -228,7 +228,7 @@ const DashProfile = () => {
           Update
         </Button>
         {
-          currentUser.isAdmin && (
+          (currentUser?.rest?.isAdmin || currentUser?.isAdmin) && (
             <Link to='/create-post'>
               <Button
                 type='button'
