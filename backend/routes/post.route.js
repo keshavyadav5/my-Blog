@@ -5,7 +5,7 @@ const router = expresss.Router()
 
 router.post('/create',verifyToken,create);
 router.get('/getposts',getposts)
-router.delete('/deletepost/:postId',deletePost)
-router.put('/updatepost/:postId',updatePost)
+router.delete('/deletepost/:postId',verifyToken,deletePost)
+router.put('/updatepost/:postId/:userId',verifyToken,updatePost)
 
 module.exports = router

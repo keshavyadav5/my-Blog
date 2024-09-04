@@ -14,6 +14,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import PrivateRoute from './components/PrivateRoute'
 import CreatePost from './pages/CreatePost'
 import AdminPrivate from './components/AdminPrivate'
+import UpdatePost from './pages/UpdatePost'
 
 const App = () => {
   return (
@@ -29,6 +30,7 @@ const App = () => {
         </Route>
         <Route element={<AdminPrivate />}>
           <Route path='/create-post' element={<CreatePost />} />
+          <Route path='/update-post/:postId' element={<UpdatePost />} />
         </Route>
         <Route path='/project' element={<Project />} />
       </Routes>
