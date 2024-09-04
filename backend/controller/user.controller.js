@@ -52,7 +52,7 @@ const deleteUser = async (req, res, next) => {
 }
 const signout = (req, res, next) => {
   try {
-    res.clearCookie('access_token') 
+    res.clearCookie('access_token')
       .status(200)
       .json({ message: 'User has been signed out' });
   } catch (error) {
@@ -60,9 +60,48 @@ const signout = (req, res, next) => {
   }
 };
 
+const getUser = async (req, res, next) => {
+  if (!req.user.isAdmin) {
+    return next(errorHandler(403, "You are not allowed to access this user"))
+  }
+  try {
+    const startIndex = parseInt(req.query.startIndex) || 0;
+    const limit = parseInt(req.query.limit) || 9;
+    const sorDirection = req.query.sort === 'asc' ? 1 : -1;
+
+    const users = await User.find()
+    .sort({createdAt : sorDirection})
+    .skip(startIndex)
+    .limit(limit)
+
+    const userWithoutPassword = users.map((user) => {
+      const { password, ...rest} = user._doc;
+      return rest;
+    })
+
+    const totalUsers = await User.countDocuments();
+
+    const now = new Date();
+    const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+
+    const lastMonthUsers = await User.countDocuments({
+      createdAt: { $gte: lastMonth }
+    })
+
+    res.status(200).json({
+      users: userWithoutPassword,
+      totalUsers,
+      lastMonthUsers
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 module.exports = {
   test,
   updateUser,
   deleteUser,
-  signout
+  signout,
+  getUser
 };
