@@ -1,6 +1,6 @@
 import { Sidebar, SidebarItem } from 'flowbite-react';
 import { useEffect, useState } from 'react';
-import { HiUser, HiArrowSmRight } from "react-icons/hi";
+import { HiUser, HiArrowSmRight, HiOutlineUserGroup } from "react-icons/hi";
 import { MdOutlinePostAdd } from "react-icons/md";
 import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -63,6 +63,15 @@ const DashSidebar = () => {
               as='div'
             >
               Posts
+            </SidebarItem>
+          </Link>
+          <Link to='/dashboard?tab=users'>
+            <SidebarItem
+              active={tab === 'users'}
+              icon={HiOutlineUserGroup}
+              as='div'
+            >
+              Users
             </SidebarItem>
           </Link>
 
