@@ -90,8 +90,9 @@ const DashProfile = () => {
       const token = currentUser.token;
 
       const res = await axios.put(
-        `http://localhost:3000/api/user/update/${currentUser.rest._id}`,
+        `http://localhost:3000/api/user/update/${currentUser?.rest?._id}`,
         {
+          username : formData.username,
           email: formData.email,
           profilePicture: formData.profilePicture,
           password: formData.password,
@@ -207,7 +208,7 @@ const DashProfile = () => {
           placeholder='username'
           defaultValue={currentUser?.username || currentUser?.rest?.username }
           onChange={handleChange}
-          readOnly
+          // readOnly
         />
         <TextInput
           type="email"
@@ -215,16 +216,16 @@ const DashProfile = () => {
           placeholder='email'
           defaultValue={currentUser?.email || currentUser?.rest?.email}
           onChange={handleChange}
-          readOnly
+          // readOnly
         />
         <TextInput
           type="password"
           id='password'
           placeholder='password'
           onChange={handleChange}
-          readOnly
+          // readOnly
         />
-        <Button type='submit' gradientDuoTone='purpleToBlue' outline disabled>
+        <Button type='submit' gradientDuoTone='purpleToBlue' outline>
           Update
         </Button>
         {

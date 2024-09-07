@@ -79,11 +79,9 @@ const Header = () => {
               <span className='block text-sm'>@{currentUser?.username || currentUser?.rest?.username}</span>
               <span className='block text-sm font-medium truncate'>{currentUser?.email || currentUser?.rest?.email}</span>
             </Dropdown.Header>
-            {
-              currentUser?.rest?.isAdmin ? (<Link to={"/dashboard?tab=profile"} >
+            <Link to={"/dashboard?tab=profile"} >
               <Dropdown.Item>Profile</Dropdown.Item>
-            </Link>) : ''
-            }
+            </Link>
             <Dropdown.Divider/>
             <Dropdown.Item onClick={handleSignout}>Sign out</Dropdown.Item>
             </Dropdown>

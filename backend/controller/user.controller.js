@@ -7,23 +7,23 @@ const test = (req, res) => {
 };
 
 const updateUser = async (req, res, next) => {
-  console.log(req.params)
+
+  // if (req.id !== req.params.userId) {
+  //   return res.status(403).json({ message: "You can only update your own account" });
+  // }
+
   try {
-    if (req.id !== req.params.userId) {
-      console.log("id didn't match")
-      return res.status(403).json({ message: "You can only update your own account" });
-    }
-
-    const updateData = {
-      email: req.body.email,
-      profilePicture: req.body.profilePicture,
-    };
-
-
-
+    const hashPassword = bcryptjs.hashSync(req.body.password)
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.userId,
-      { $set: updateData },
+      req.id,
+      {
+        $set: {
+          username: req.body.username,
+          email: req.body.email,
+          password: hashPassword,
+          profilePicture: req.body.profilePicture
+        }
+      },
       { new: true }
     );
 
@@ -61,7 +61,7 @@ const signout = (req, res, next) => {
 };
 
 const getUser = async (req, res, next) => {
-  
+
   if (!req?.user?.isAdmin) {
     return next(errorHandler(403, "You are not allowed to access this user"))
   }
@@ -71,12 +71,12 @@ const getUser = async (req, res, next) => {
     const sorDirection = req.query.sort === 'asc' ? 1 : -1;
 
     const users = await User.find()
-    .sort({createdAt : sorDirection})
-    .skip(startIndex)
-    .limit(limit)
+      .sort({ createdAt: sorDirection })
+      .skip(startIndex)
+      .limit(limit)
 
     const userWithoutPassword = users.map((user) => {
-      const { password, ...rest} = user._doc;
+      const { password, ...rest } = user._doc;
       return rest;
     })
 

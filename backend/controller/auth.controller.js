@@ -44,7 +44,7 @@ const SignIn = async (req, res, next) => {
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
       process.env.SECRET_KEY, {
-      expiresIn: '1h',
+      expiresIn: '3h',
     }
     );
 

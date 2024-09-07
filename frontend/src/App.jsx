@@ -15,6 +15,7 @@ import PrivateRoute from './components/PrivateRoute'
 import CreatePost from './pages/CreatePost'
 import AdminPrivate from './components/AdminPrivate'
 import UpdatePost from './pages/UpdatePost'
+import PostPage from './pages/PostPage'
 
 const App = () => {
   return (
@@ -33,6 +34,7 @@ const App = () => {
           <Route path='/update-post/:postId' element={<UpdatePost />} />
         </Route>
         <Route path='/project' element={<Project />} />
+        <Route path='/postpage/:postSlug' element={<PostPage />} />
       </Routes>
       <ToastContainer position='top-center' />
       <FooterComponent />

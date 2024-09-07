@@ -19,7 +19,7 @@ const create = async (req, res, next) => {
     userId: req.user.id,
   });
   try {
-    const savedPost = await newPost.save(); // Ensure this is being used
+    const savedPost = await newPost.save(); 
     res.status(201).json(savedPost);
   } catch (error) {
     next(error);
@@ -78,6 +78,7 @@ const deletePost = async (req, res, next) => {
   }
 }
 const updatePost = async (req, res, next) => {
+  
   if (!req.user.isAdmin && req.user.id !== req.params.userId) {
     return next(errorHandler(403, "You are not allowed to update the post"));
   }
