@@ -1,14 +1,16 @@
 import axios from 'axios'
 import { Alert, Button, Textarea } from 'flowbite-react'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
+import Comment from './comment'
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector(state => state.user)
   const [comment, setComment] = useState('')
   const [commentError, setCommentError] = useState(null)
+  const [comments, setComments] = useState([])
 
   const handlesubmit = async (e) => {
     e.preventDefault()
@@ -23,13 +25,35 @@ const CommentSection = ({ postId }) => {
       })
       if (res.data.success === false) {
         toast(res.data.message)
+      } else {
+        toast.success("Comment added successfully")
+        setComments([res.data, ...comments])
+        setComment('') 
+        setCommentError(null)
       }
-      setComment('')
-      setCommentError(null)
     } catch (error) {
       setCommentError(error.message)
     }
   }
+
+  const addComment = (e) =>{
+    setComment(e.target.value)
+  }
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3000/api/comment/getcomment/${postId}`, {
+          withCredentials: true
+        })
+        setComments(res.data)
+      } catch (error) {
+        console.log(error.message);
+        toast.error(error.message)
+      }
+    }
+    fetchComments()
+  }, [postId])
 
   return (
     <div className='max-w-2xl mx-auto w-full p-3'>
@@ -46,20 +70,19 @@ const CommentSection = ({ postId }) => {
           ) :
           (
             <div className='text-sm text-emerald-500 my-5'>
-              You must Signed in to comment.
+              You must sign in to comment.
               <Link to={'/sign-in'} className='ml-1 text-red-500 underline'>Sign in</Link>
             </div>
           )
       }
       {
         currentUser && (
-          <form className='border border-e-teal-500 rounded-md p-3
-          ' onSubmit={handlesubmit}>
+          <form className='border border-e-teal-500 rounded-md p-3' onSubmit={handlesubmit}>
             <Textarea
               placeholder='Add a comment...'
               rows='3'
               maxLength='200'
-              onChange={(e) => setComment(e.target.value)}
+              onChange={addComment}
               value={comment}
             />
             <div className='flex justify-between items-center mt-5'>
@@ -74,6 +97,24 @@ const CommentSection = ({ postId }) => {
           </form>
         )
       }
+      {comments.length === 0 ? (
+        <p className='text-sm text-gray-500'>No comments yet.</p>
+      ) : (
+        <>
+          <div className='text-sm my-5 flex items-center gap-2'>
+            <p>Comments</p>
+            <p className='text-gray-500 border border-gray-500 py-1 px-2 rounded-sm'>{comments.length}</p>
+          </div>
+          {
+            comments.map((comment, index) => (
+              <Comment
+                key={comment?._id}
+                comment={comment}
+              />
+            ))
+          }
+        </>
+      )}
     </div>
   )
 }
