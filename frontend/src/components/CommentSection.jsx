@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
-import Comment from './comment'
+import Comment from './Comment'
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector(state => state.user)
@@ -13,22 +13,21 @@ const CommentSection = ({ postId }) => {
   const [comments, setComments] = useState([])
   const navigate = useNavigate()
 
-  const handlesubmit = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      if (comment.length > 200) { return; }
+      if (comment.length > 200) return
       const res = await axios.post(`http://localhost:3000/api/comment/create`, {
         content: comment,
         userId: currentUser?.rest?._id || currentUser?._id,
         postId
-      }, {
-        withCredentials: true
-      })
+      }, { withCredentials: true })
+
       if (res.data.success === false) {
         toast(res.data.message)
       } else {
         toast.success("Comment added successfully")
-        setComments([res.data, ...comments])
+        setComments([res.data, ...comments]) // Add new comment at the beginning
         setComment('')
         setCommentError(null)
       }
@@ -44,12 +43,10 @@ const CommentSection = ({ postId }) => {
   useEffect(() => {
     const fetchComments = async () => {
       try {
-        const res = await axios.get(`http://localhost:3000/api/comment/getcomment/${postId}`, {
-          withCredentials: true
-        })
+        const res = await axios.get(`http://localhost:3000/api/comment/getcomment/${postId}`, { withCredentials: true })
         setComments(res.data)
       } catch (error) {
-        console.log(error.message);
+        console.log(error.message)
         toast.error(error.message)
       }
     }
@@ -64,24 +61,24 @@ const CommentSection = ({ postId }) => {
       }
       const res = await axios.put(`http://localhost:3000/api/comment/likeComment/${commentId}`, {
         userId: currentUser?._id,
-      }, {
-        withCredentials: true
-      })
+      }, { withCredentials: true })
       if (res.data.success === false) {
         toast(res.data.message)
       }
-      setComment(comments.map((comment) => {
-        comment._id === commentId ? {
-          ...comment,
-          likes: res.data.likes,
-          numberOfLikes: res.data.likes.length,
-        } : comment
-      }))
-
+      setComments(comments.map(comment =>
+        comment._id === commentId ? { ...comment, likes: res.data.likes } : comment
+      ))
     } catch (error) {
-      console.log(error.message);
+      console.log(error.message)
     }
   }
+
+  const handleEdit = (commentId, editedContent) => {
+    setComments(comments.map(comment =>
+      comment._id === commentId ? { ...comment, content: editedContent } : comment
+    ))
+  }
+  
 
   return (
     <div className='max-w-2xl mx-auto w-full p-3'>
@@ -105,7 +102,7 @@ const CommentSection = ({ postId }) => {
       }
       {
         currentUser && (
-          <form className='border border-e-teal-500 rounded-md p-3' onSubmit={handlesubmit}>
+          <form className='border border-e-teal-500 rounded-md p-3' onSubmit={handleSubmit}>
             <Textarea
               placeholder='Add a comment...'
               rows='3'
@@ -134,11 +131,12 @@ const CommentSection = ({ postId }) => {
             <p className='text-gray-500 border border-gray-500 py-1 px-2 rounded-sm'>{comments.length}</p>
           </div>
           {
-            comments.map((comment, index) => (
+            comments.map((comment) => (
               <Comment
-                key={comment?._id}
+                key={comment._id}
                 comment={comment}
                 onlike={handleLikes}
+                onEdit={handleEdit}
               />
             ))
           }

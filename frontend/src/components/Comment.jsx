@@ -3,10 +3,13 @@ import moment from 'moment'
 import axios from 'axios'
 import { useSelector } from 'react-redux'
 import { FaThumbsUp } from "react-icons/fa6";
+import { Button, Textarea } from 'flowbite-react'
 
-const Comment = ({ comment, onlike }) => {
+const Comment = ({ comment, onlike, onEdit }) => {
   const { currentUser } = useSelector((state) => state.user)
   const [user, setUser] = useState({})
+  const [isEditing, setIsEditing] = useState(false)
+  const [editedContent, setEditedContent] = useState(comment.content)
   const [likes, setLikes] = useState(comment.likes)
   const [hasLiked, setHasLiked] = useState(false)
 
@@ -18,7 +21,7 @@ const Comment = ({ comment, onlike }) => {
         })
         setUser(res?.data)
       } catch (error) {
-        console.log(error.message);
+        console.log(error.message)
       }
     }
     getUser()
@@ -45,6 +48,22 @@ const Comment = ({ comment, onlike }) => {
     }
   }
 
+  const handleSave = async () => {
+    try {
+      const res = await axios.put(
+        `http://localhost:3000/api/comment/editComment/${comment._id}`,
+        { content: editedContent },
+        { withCredentials: true }
+      )
+      setIsEditing(false)
+      onEdit(comment._id, editedContent)
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
+
+
   return (
     <div className='flex p-4 border-b dark:border-gray-600 text-sm'>
       <div className='flex-shrink-0 mr-3'>
@@ -55,19 +74,61 @@ const Comment = ({ comment, onlike }) => {
           <span>{user ? `@${user?.username}` : 'anonymous user'}</span>
           <span className="text-gray-600 text-xs ">{moment(comment.createdAt).fromNow()}</span>
         </div>
-        <p className='text-gray-500 mb-2'>{comment?.content}</p>
-        <div className="">
-          <button
-            type='button'
-            onClick={handleLike}
-            className={`text-gray-500 hover:text-blue-500 text-sm ${
-              hasLiked ? '!text-blue-500' : ''
-            }`}
-          >
-            <FaThumbsUp />
-          </button>
-          <span className='ml-2'>{likes.length}</span>
-        </div>
+        {
+          isEditing ? (
+            <>
+              <Textarea
+                className='mb-2'
+                value={editedContent}
+                onChange={(e) => setEditedContent(e.target.value)}
+              />
+              <div className="flex justify-end gap-3 text-xs">
+                <Button
+                  type='button'
+                  size='sm'
+                  gradientDuoTone='purpleToBlue'
+                  onClick={handleSave}
+                >
+                  Save
+                </Button>
+                <Button
+                  type='button'
+                  size='sm'
+                  gradientDuoTone='purpleToBlue'
+                  outline
+                  onClick={() => setIsEditing(false)}
+                >
+                  Cancel
+                </Button>
+              </div>
+            </>
+          )
+            :
+            (<>
+              <p className='text-gray-500 mb-2'>{comment?.content}</p>
+              <div className="">
+                <button
+                  type='button'
+                  onClick={handleLike}
+                  className={`text-gray-500 hover:text-blue-500 text-sm ${hasLiked ? '!text-blue-500' : ''
+                    }`}
+                >
+                  <FaThumbsUp />
+                </button>
+                <span className='ml-2'>{likes.length}</span>
+                {
+                  currentUser && (currentUser?.rest?._id === comment.userId || currentUser?.rest?.isAdmin || currentUser?.isAdmin) && (
+                    <button
+                      type='button'
+                      className='text-gray-500 hover:text-blue-500 text-sm ml-2'
+                      onClick={() => setIsEditing(true)}
+                    >Edit
+                    </button>
+                  )
+                }
+              </div>
+            </>)
+        }
       </div>
     </div>
   )
