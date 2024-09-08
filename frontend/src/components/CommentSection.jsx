@@ -2,7 +2,7 @@ import axios from 'axios'
 import { Alert, Button, Textarea } from 'flowbite-react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import Comment from './comment'
 
@@ -11,6 +11,7 @@ const CommentSection = ({ postId }) => {
   const [comment, setComment] = useState('')
   const [commentError, setCommentError] = useState(null)
   const [comments, setComments] = useState([])
+  const navigate = useNavigate()
 
   const handlesubmit = async (e) => {
     e.preventDefault()
@@ -28,7 +29,7 @@ const CommentSection = ({ postId }) => {
       } else {
         toast.success("Comment added successfully")
         setComments([res.data, ...comments])
-        setComment('') 
+        setComment('')
         setCommentError(null)
       }
     } catch (error) {
@@ -36,7 +37,7 @@ const CommentSection = ({ postId }) => {
     }
   }
 
-  const addComment = (e) =>{
+  const addComment = (e) => {
     setComment(e.target.value)
   }
 
@@ -54,6 +55,33 @@ const CommentSection = ({ postId }) => {
     }
     fetchComments()
   }, [postId])
+
+  const handleLikes = async (commentId) => {
+    try {
+      if (!currentUser) {
+        toast.error("Please login to like a comment")
+        navigate('/sign-in')
+      }
+      const res = await axios.put(`http://localhost:3000/api/comment/likeComment/${commentId}`, {
+        userId: currentUser?._id,
+      }, {
+        withCredentials: true
+      })
+      if (res.data.success === false) {
+        toast(res.data.message)
+      }
+      setComment(comments.map((comment) => {
+        comment._id === commentId ? {
+          ...comment,
+          likes: res.data.likes,
+          numberOfLikes: res.data.likes.length,
+        } : comment
+      }))
+
+    } catch (error) {
+      console.log(error.message);
+    }
+  }
 
   return (
     <div className='max-w-2xl mx-auto w-full p-3'>
@@ -110,6 +138,7 @@ const CommentSection = ({ postId }) => {
               <Comment
                 key={comment?._id}
                 comment={comment}
+                onlike={handleLikes}
               />
             ))
           }

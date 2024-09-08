@@ -1,23 +1,50 @@
 import React, { useEffect, useState } from 'react'
 import moment from 'moment'
 import axios from 'axios'
+import { useSelector } from 'react-redux'
+import { FaThumbsUp } from "react-icons/fa6";
 
-const Comment = ({ comment }) => {
+const Comment = ({ comment, onlike }) => {
+  const { currentUser } = useSelector((state) => state.user)
   const [user, setUser] = useState({})
+  const [likes, setLikes] = useState(comment.likes)
+  const [hasLiked, setHasLiked] = useState(false)
 
   useEffect(() => {
-    try {
-      const getUser = async () => {
+    const getUser = async () => {
+      try {
         const res = await axios.get(`http://localhost:3000/api/user/${comment.userId}`, {
           withCredentials: true
         })
         setUser(res?.data)
+      } catch (error) {
+        console.log(error.message);
       }
-      getUser();
-    } catch (error) {
-      console.log(error.message);
     }
-  }, [comment,user])
+    getUser()
+
+    if (currentUser && likes.includes(currentUser._id || currentUser.rest._id)) {
+      setHasLiked(true)
+    }
+  }, [comment, currentUser, likes])
+
+  const handleLike = async () => {
+    try {
+      const userId = currentUser?.rest?._id || currentUser?._id
+      await onlike(comment?._id)
+
+      if (hasLiked) {
+        setLikes(likes.filter(id => id !== userId))
+        setHasLiked(false)
+      } else {
+        setLikes([...likes, userId])
+        setHasLiked(true)
+      }
+    } catch (error) {
+      console.log(error.message)
+    }
+  }
+
   return (
     <div className='flex p-4 border-b dark:border-gray-600 text-sm'>
       <div className='flex-shrink-0 mr-3'>
@@ -29,9 +56,21 @@ const Comment = ({ comment }) => {
           <span className="text-gray-600 text-xs ">{moment(comment.createdAt).fromNow()}</span>
         </div>
         <p className='text-gray-500 mb-2'>{comment?.content}</p>
+        <div className="">
+          <button
+            type='button'
+            onClick={handleLike}
+            className={`text-gray-500 hover:text-blue-500 text-sm ${
+              hasLiked ? '!text-blue-500' : ''
+            }`}
+          >
+            <FaThumbsUp />
+          </button>
+          <span className='ml-2'>{likes.length}</span>
+        </div>
       </div>
     </div>
   )
 }
 
-export default Comment 
+export default Comment
