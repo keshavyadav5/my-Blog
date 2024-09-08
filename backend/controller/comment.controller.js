@@ -60,9 +60,25 @@ const editComment = async (req, res, next) => {
   res.status(200).json(editComment)
 }
 
+const deleteComment = async (req, res, next) => {
+  try {
+    const comment = await Comment.findById(req.params.commentId)
+    if (!comment) return res.status(404).json({ message: "Comment not found" })
+
+    if (comment.userId !== req.user.id && !req.user.isAdmin) {
+      return res.status(401).json({ message: "You are not authorized to edit this comment" })
+    }
+    await Comment.findByIdAndDelete(req.params.commentId)
+    res.status(200).json({ message: "Comment is deleted successfully" })
+  } catch (error) {
+    next(error.message)
+  }
+}
+
 module.exports = {
   createComment,
   getComment,
   likeComment,
-  editComment
+  editComment,
+  deleteComment
 }

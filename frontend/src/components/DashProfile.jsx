@@ -262,7 +262,7 @@ const DashProfile = () => {
         <Modal.Body>
           <div className="text-center">
             <HiOutlineExclamationCircle className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
-            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Are you sure to delete your accoount?</h3>
+            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Are you sure to delete your account?</h3>
             <div className='flex justify-center gap-5'>
               <Button color='failure' onClick={handleDeleteUser}>
                 Yes, I'm sure

@@ -1,16 +1,19 @@
 import axios from 'axios'
-import { Alert, Button, Textarea } from 'flowbite-react'
+import { Alert, Button, Modal, Textarea } from 'flowbite-react'
 import React, { useEffect, useState } from 'react'
 import { useSelector } from 'react-redux'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 import Comment from './Comment'
+import { HiOutlineExclamationCircle } from "react-icons/hi";
 
 const CommentSection = ({ postId }) => {
   const { currentUser } = useSelector(state => state.user)
   const [comment, setComment] = useState('')
   const [commentError, setCommentError] = useState(null)
   const [comments, setComments] = useState([])
+  const [showModel, setShowModel] = useState(false)
+  const [commentToDelete, setCommentToDelete] = useState(null)
   const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
@@ -26,8 +29,7 @@ const CommentSection = ({ postId }) => {
       if (res.data.success === false) {
         toast(res.data.message)
       } else {
-        toast.success("Comment added successfully")
-        setComments([res.data, ...comments]) // Add new comment at the beginning
+        setComments([res.data, ...comments])
         setComment('')
         setCommentError(null)
       }
@@ -47,7 +49,6 @@ const CommentSection = ({ postId }) => {
         setComments(res.data)
       } catch (error) {
         console.log(error.message)
-        toast.error(error.message)
       }
     }
     fetchComments()
@@ -62,9 +63,6 @@ const CommentSection = ({ postId }) => {
       const res = await axios.put(`http://localhost:3000/api/comment/likeComment/${commentId}`, {
         userId: currentUser?._id,
       }, { withCredentials: true })
-      if (res.data.success === false) {
-        toast(res.data.message)
-      }
       setComments(comments.map(comment =>
         comment._id === commentId ? { ...comment, likes: res.data.likes } : comment
       ))
@@ -77,6 +75,24 @@ const CommentSection = ({ postId }) => {
     setComments(comments.map(comment =>
       comment._id === commentId ? { ...comment, content: editedContent } : comment
     ))
+  }  
+
+  const handleDelete = async () => {
+    try {
+      const res = await axios.delete(`http://localhost:3000/api/comment/deleteComment/${commentToDelete}`, {
+        withCredentials: true
+      })
+      if (res.data.success) {
+        setShowModel(false)
+        setComments(
+          comments.filter(comment => comment._id !== commentToDelete)
+          
+        )
+      }
+    } catch (error) {
+      console.log(error.message)
+      toast.error('Error deleting the comment')
+    }
   }
   
 
@@ -137,11 +153,37 @@ const CommentSection = ({ postId }) => {
                 comment={comment}
                 onlike={handleLikes}
                 onEdit={handleEdit}
+                onDelete={commentId => {
+                  setShowModel(true)
+                  setCommentToDelete(commentId)
+                }}
               />
             ))
           }
         </>
       )}
+      <Modal
+        show={showModel}
+        onClick={() => setShowModel(false)}
+        popup
+        size='md'
+      >
+        <Modal.Header />
+        <Modal.Body>
+          <div className="text-center">
+            <HiOutlineExclamationCircle className='w-14 h-14 text-gray-400 dark:text-gray-200 mb-4 mx-auto' />
+            <h3 className='mb-5 text-lg text-gray-500 dark:text-gray-200'>Are you sure to delete your comment?</h3>
+            <div className='flex justify-center gap-5'>
+              <Button color='failure' onClick={handleDelete}>
+                Yes, I'm sure
+              </Button>
+              <Button color='gray' onClick={() => setShowModel(false)}>
+                No, cancel
+              </Button>
+            </div>
+          </div>
+        </Modal.Body>
+      </Modal>
     </div>
   )
 }
