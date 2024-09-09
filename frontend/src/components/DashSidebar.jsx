@@ -6,6 +6,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { signoutSuccess } from '../redux/userSlice';
 import { useDispatch, useSelector } from 'react-redux'
+import { MdDashboardCustomize } from "react-icons/md";
 import axios from 'axios';
 
 const DashSidebar = () => {
@@ -46,6 +47,16 @@ const DashSidebar = () => {
       <Sidebar.Items>
         <Sidebar.ItemGroup className='flex gap-1 flex-col'>
 
+          <Link to='/dashboard?tab=dash'>
+            <SidebarItem
+              active={tab === 'dash'}
+              icon={MdDashboardCustomize} 
+              labelColor='dark'
+              as='div'
+            >
+              Dashboard
+            </SidebarItem>
+          </Link>
           <Link to='/dashboard?tab=profile'>
             <SidebarItem
               active={tab === 'profile'}

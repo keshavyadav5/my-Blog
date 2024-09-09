@@ -10,7 +10,7 @@ const DashComment = () => {
   const [showMore, setShowMore] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [commentIdToDelete, setCommentIdToDelete] = useState('');
-  const [totalComments, setTotalComments] = useState(0); // Track total comments from backend
+  const [totalComments, setTotalComments] = useState(0); 
 
   useEffect(() => {
     const fetchComments = async () => {
@@ -39,7 +39,6 @@ const DashComment = () => {
         withCredentials: true
       });
       setComments((prev) => [...prev, ...res.data.comments]);
-      // Disable "Show more" if the total comments length is reached
       if (comments.length + res.data.comments.length >= res.data.totalComments) {
         setShowMore(false);
       }
@@ -55,9 +54,9 @@ const DashComment = () => {
         withCredentials: true
       });
       setComments((prev) => prev.filter((comment) => comment._id !== commentIdToDelete));
-      setTotalComments((prev) => prev - 1); // Update total comments after deletion
+      setTotalComments((prev) => prev - 1); 
       if (comments.length - 1 < totalComments) {
-        setShowMore(true); // Allow showing more if deletion brings below totalComments
+        setShowMore(true); 
       }
     } catch (error) {
       console.log(error.message);
