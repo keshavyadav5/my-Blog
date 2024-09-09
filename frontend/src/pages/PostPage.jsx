@@ -5,12 +5,14 @@ import { toast } from 'react-toastify'
 import { Button, Spinner } from 'flowbite-react'
 import CallToAction from '../components/CallToAction'
 import CommentSection from '../components/CommentSection'
+import PostCard from '../components/PostCard'
 
 const PostPage = () => {
   const { postSlug } = useParams()
   const [post, setPost] = useState(null)
   const [error, setError] = useState(false)
   const [loading, setLoading] = useState();
+  const [recentPosts, setRecentPosts] = useState(null)
 
 
   useEffect(() => {
@@ -35,6 +37,21 @@ const PostPage = () => {
     }
     fetchPost()
   }, [postSlug])
+
+  useEffect(() => {
+    const fetchRecentPosts = async () => {
+      try {
+        const res = await axios.get('http://localhost:3000/api/post/getposts?limit=3', {
+          withCredentials: true
+        })
+        setRecentPosts(res?.data?.posts)
+      } catch (error) {
+        console.log(error.message);
+      }
+    }
+    fetchRecentPosts()
+  }, [])
+
   if (loading) return (
     <div className='flex justify-center items-center min-h-screen'>
       <Spinner size='xl' />
@@ -55,7 +72,15 @@ const PostPage = () => {
       <div className='max-w-4xl mx-auto w-full'>
         <CallToAction />
       </div>
-      <CommentSection postId={ post && post[0]?._id} />
+      <CommentSection postId={post && post[0]?._id} />
+
+      <div className="flex flex-col justify-center items-center mb-5">
+      <div className="text-xl mt-5">Recent articles</div>
+      <div className='flex flex-wrap gap-5 mt-5 justify-center'>
+          {recentPosts &&
+            recentPosts.map((post) => <PostCard key={post._id} post={post} />)}
+        </div>
+      </div>
     </main>
   )
 }
